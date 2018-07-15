@@ -9,6 +9,7 @@
 import logging
 import warnings
 
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from functools import wraps
@@ -123,6 +124,7 @@ def _default_auth_request_handler():
 
     if identity:
         is_super_user = False
+        from database import s
         from models.rbac import RBACGroupPermission, group_permission_to_user
         user = identity
         if user.superuser:
