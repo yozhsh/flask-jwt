@@ -157,10 +157,10 @@ def _default_auth_request_handler():
 
 def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False):
     return jsonify({
-        'access_token': access_token.decode('utf-8')},
+        'access_token': access_token.decode('utf-8')
         menulinks, # nested object like a {"somemenulink"}
         'super_user': superuser_status
-    )
+    },)
 
 
 def _default_jwt_error_handler(error):
