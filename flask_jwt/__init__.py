@@ -122,14 +122,45 @@ def _default_auth_request_handler():
     identity = _jwt.authentication_callback(username, password)
 
     if identity:
+        is_super_user = False
+        from models.rbac import RBACGroupPermission, group_permission_to_user
+        user = identity
+        if user.superuser:
+            is_super_user = user.superuser
+        group = s.query(group_permission_to_user.c.rbac_group_permission_id).filter(group_permission_to_user.c.user_id == user.id).all()
+        user_groups = RBACGroupPermission.query.filter(RBACGroupPermission.id.in_(group)).all()
+        response_data = []
+        for i in user_groups:
+            data = {}
+            data['name'] = i.name
+            data['link'] = []
+            for x in i.link.all():
+                link_data = {}
+                link_data['name'] = x.name
+                link_data['address'] = x.address
+                data['link'].append(link_data)
+            response_data.append(data)
+            data['group_permission'] = []
+            for z in i.permission:
+                perm_data = {}
+                perm_data['name'] = z.name
+                print(z)
+                perm_data['METHOD'] = z.permission.value
+                data['group_permission'].append(perm_data)
+
+
         access_token = _jwt.jwt_encode_callback(identity)
-        return _jwt.auth_response_callback(access_token, identity)
+        return _jwt.auth_response_callback(access_token, identity, response_data, is_super_user)
     else:
         raise JWTError('Bad Request', 'Invalid credentials')
 
 
-def _default_auth_response_handler(access_token, identity):
-    return jsonify({'access_token': access_token.decode('utf-8')})
+def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False):
+    return jsonify({
+        'access_token': access_token.decode('utf-8')},
+        menulinks, # nested object like a {"somemenulink"}
+        'super_user': superuser_status
+    )
 
 
 def _default_jwt_error_handler(error):
