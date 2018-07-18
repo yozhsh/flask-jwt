@@ -19,7 +19,7 @@ import jwt
 from flask import current_app, request, jsonify, _request_ctx_stack
 from werkzeug.local import LocalProxy
 
-__version__ = '0.3.2'
+__version__ = '0.3.3b'
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +129,7 @@ def _default_auth_request_handler():
         user = identity
         if user.superuser:
             is_super_user = user.superuser
+            super_user_name = user.nickname
         group = s.query(group_permission_to_user.c.rbac_group_permission_id).filter(group_permission_to_user.c.user_id == user.id).all()
         user_groups = RBACGroupPermission.query.filter(RBACGroupPermission.id.in_(group)).all()
         response_data = []
@@ -157,8 +158,8 @@ def _default_auth_request_handler():
         raise JWTError('Bad Request', 'Invalid credentials')
 
 
-def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False):
-    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status})
+def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False, super_user_name=None):
+    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status, "super_user_name": super_user_name})
 
 
 def _default_jwt_error_handler(error):
