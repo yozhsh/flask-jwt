@@ -127,6 +127,7 @@ def _default_auth_request_handler():
         from database import s
         from models.rbac import RBACGroupPermission, group_permission_to_user
         user = identity
+        departament_id = user.departament_id
         if user.superuser:
             is_super_user = user.superuser
             super_user_name = user.nickname
@@ -153,13 +154,13 @@ def _default_auth_request_handler():
 
 
         access_token = _jwt.jwt_encode_callback(identity)
-        return _jwt.auth_response_callback(access_token, identity, response_data, is_super_user)
+        return _jwt.auth_response_callback(access_token, identity, response_data, is_super_user, super_user_name, departament_id)
     else:
         raise JWTError('Bad Request', 'Invalid credentials')
 
 
-def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False, super_user_name=None):
-    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status, "super_user_name": super_user_name})
+def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False, super_user_name=None, departament_id=None):
+    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status, "super_user_name": super_user_name, "departament_id": departament_id})
 
 
 def _default_jwt_error_handler(error):

@@ -2,6 +2,7 @@
 
 # Packages
 .cache
+.idea/
 *.egg
 *.egg-info
 dist
