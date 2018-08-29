@@ -131,6 +131,7 @@ def _default_auth_request_handler():
         if user.superuser:
             is_super_user = user.superuser
             super_user_name = user.nickname
+        username = str(user.firstname) + ' ' + str(user.secondname)
         group = s.query(group_permission_to_user.c.rbac_group_permission_id).filter(group_permission_to_user.c.user_id == user.id).all()
         user_groups = RBACGroupPermission.query.filter(RBACGroupPermission.id.in_(group)).all()
         response_data = []
@@ -154,13 +155,13 @@ def _default_auth_request_handler():
 
 
         access_token = _jwt.jwt_encode_callback(identity)
-        return _jwt.auth_response_callback(access_token, identity, response_data, is_super_user, super_user_name, departament_id)
+        return _jwt.auth_response_callback(access_token, identity, response_data, is_super_user, super_user_name, departament_id, username)
     else:
         raise JWTError('Bad Request', 'Invalid credentials')
 
 
-def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False, super_user_name=None, departament_id=None):
-    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status, "super_user_name": super_user_name, "departament_id": departament_id})
+def _default_auth_response_handler(access_token, identity, menulinks, superuser_status=False, super_user_name=None, departament_id=None, username=None):
+    return jsonify({'access_token': access_token.decode('utf-8'), "menulinks": menulinks, 'super_user': superuser_status, "super_user_name": super_user_name, "departament_id": departament_id, "username": username})
 
 
 def _default_jwt_error_handler(error):
