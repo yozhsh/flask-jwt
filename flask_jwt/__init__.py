@@ -131,8 +131,10 @@ def _default_auth_request_handler():
         if user.superuser:
             is_super_user = user.superuser
             super_user_name = user.nickname
-        username = str(user.firstname) + ' ' + str(user.secondname)
-        group = s.query(group_permission_to_user.c.rbac_group_permission_id).filter(group_permission_to_user.c.user_id == user.id).all()
+        else:
+            super_user_name = ''
+            username = str(user.firstname) + ' ' + str(user.secondname)
+            group = s.query(group_permission_to_user.c.rbac_group_permission_id).filter(group_permission_to_user.c.user_id == user.id).all()
         user_groups = RBACGroupPermission.query.filter(RBACGroupPermission.id.in_(group)).all()
         response_data = []
         for i in user_groups:
